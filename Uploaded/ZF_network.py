@@ -90,8 +90,8 @@ class TorchCNN(nn.Module):
 #                 print(f'layer {i}, {type(layer)}')
         return x
         
-mnist_train = torch.load('../data/MNIST/processed/training.pt')
-mnist_test = torch.load('../data/MNIST/processed/test.pt')
+mnist_train = torch.load('/data/MNIST/processed/training.pt')
+mnist_test = torch.load('/data/MNIST/processed/test.pt')
 
 transform = transforms.Compose([transforms.Resize((224,224))])
 train = []
