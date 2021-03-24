@@ -7,6 +7,8 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from torchsummary import summary
 from PIL import Image
+from mnist.loader import MNIST
+
 
 class TorchCNN(nn.Module):
     def __init__(self):
@@ -30,7 +32,7 @@ class TorchCNN(nn.Module):
 
         # hidden layer 1
         self.pool1 = nn.MaxPool2d(kernel_size=3, stride=2)
-        self.norm1 = nn.LocalResponseNorm()
+        self.norm1 = nn.LocalResponseNorm(96)
         self.conv1 = nn.Conv2d(96, 256, kernel_size=5, stride=2)
         self.relu1 = nn.ReLU()
 
@@ -38,7 +40,7 @@ class TorchCNN(nn.Module):
 
         # hidden layer 2
         self.pool2 = nn.MaxPool2d(kernel_size=3, stride=2)
-        self.norm2 = nn.LocalResponseNorm()
+        self.norm2 = nn.LocalResponseNorm(256)
         self.conv2 = nn.Conv2d(256, 384, kernel_size=3, stride=1)
         self.relu2 = nn.ReLU()
 
@@ -77,9 +79,48 @@ class TorchCNN(nn.Module):
 
         return x
 
-mnist_trainset = datasets.MNIST(root='./data', train=True, download=True, transform=None)
-mnist_testset = datasets.MNIST(root='./data', train=False, download=True, transform=None)
+#mnist_trainset = datasets.MNIST(root='./data', train=True, download=True, transform=None)
+#mnist_testset = datasets.MNIST(root='./data', train=False, download=True, transform=None)
+
+mndata = MNIST('MNIST')
+
+images, labels = mndata.load_training()
 
 net = TorchCNN()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+
+batch = len(images)
+train_set = np.array(images)
+
+train_set = train_set.reshape(batch,28,28)
+
+train_tensor = torch.from_numpy(train_set)
+print(train_tensor.size())
+
+
+transform = transforms.Compose([
+     transforms.Resize((110,110))
+     ])
+train_tensor = transform(train_tensor)
+train_label_tensor = torch.FloatTensor(labels)
+
+img = train_tensor.numpy()
+plt.imshow(img[0])
+plt.show()
+
+    
+train_loader = TensorDataset(train_tensor, train_label_tensor)
+
+
+
+l1, i1 = next(iter(train_loader))
+print(i1.shape)
+print(l1.shape)
+
+
+
+
+ 
+
